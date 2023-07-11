@@ -49,6 +49,12 @@
       let gameMap = null;
       let lastPickUpItem = 0;
       let playPickUpItemAnimation = false;
+      let rupeeAmount = 0;
+      let linkHearts = 3;
+      let currentLinkHearts = 3;
+      let keyAmoutn = 1;
+      let bombAmount = 5;
+      let swordEqipped = 0;
 
       function GameObject() {
         this.x = 0;
@@ -80,6 +86,12 @@
       function MapBundle(m, o) {
         this.map = m;
         this.gameobjects = o;
+      }
+
+      function playSound(source) {
+        let song = new Audio();
+        song.src = source;
+        song.play();
       }
 
       function keyDownHandler(e) {
@@ -454,8 +466,9 @@
                   case 13:
                     break;
                   case 14:
-                    lastPickUpItem = 14;
+                    lastPickUpItem = gameObjects[i].pickUpItemNum;
                     swordEqipped = 1;
+                    playSound("./assets/sounds/LOZ_Get_Item.wav");
                     break;
                 }
                 objects.splice(i, 1);
@@ -468,7 +481,6 @@
       function drawGameObjects() {
         for (let i = 0; i < gameObjects.length; i++) {
           if (gameObjects[i].isPickUpItem) {
-            
             // 0- boomerang
             // 1- bomb
             // 2- bow and arrow
@@ -541,6 +553,7 @@
                   0,
                   gameObjects[i].line1Current.length + 1
                 );
+                playSound("./assets/sounds/LOZ_Text_Slow.wav");
               } else if (
                 gameObjects[i].line2Full.length !=
                 gameObjects[i].line2Current.length
@@ -551,6 +564,7 @@
                   0,
                   gameObjects[i].line2Current.length + 1
                 );
+                playSound("./assets/sounds/LOZ_Text_Slow.wav");
               }
             }
             ctx.fillStyle = "white";
@@ -629,7 +643,50 @@
           }
         }
       }
+      function drawHUD() {
+        ctx.drawImage(hud, 258, 11, 256, 56, 0, 0, 256, 56);
+        ctx.fillStyle = "black";
+        ctx.fillRect(176, 32, 64, 16);
 
+        let fullHearts = Math.floor(currentLinkHearts);
+        let halfHearts = currentLinkHearts - fullHearts;
+
+        for (let i = 0; i < linkHearts; i++) {
+          let heartY = 40;
+          let heartX = 176 + i * 8;
+          if (i > 7) {
+            heartY = 40 - 8;
+            heartX -= 64;
+          }
+          ctx.drawImage(hud, 627, 117, 8, 8, heartX, heartY, 8, 8);
+        }
+        let halfHeartX = 0;
+        let halfHeartY = 0;
+        for (let i = 0; i < fullHearts; i++) {
+          let heartY = 40;
+          let heartX = 176 + i * 8;
+          if (i > 7) {
+            heartY = 40 - 8;
+            heartX -= 64;
+          }
+          ctx.drawImage(hud, 645, 117, 8, 8, heartX, heartY, 8, 8);
+
+          if (i == fullHearts - 1) {
+            if (i > 6) {
+              halfHeartY = 40 - 8;
+              halfHeartX = 176 + (i % 7) * 8;
+            } else {
+              halfHeartY = 40;
+              halfHeartX = 176 + i * 8 + 8;
+            }
+          }
+        }
+        if (halfHearts > 0 && fullHearts >= 1) {
+          ctx.drawImage(hud, 636, 117, 8, 8, halfHeartX, halfHeartY, 8, 8);
+        } else if (halfHearts > 0 && fullHearts == 0) {
+          ctx.drawImage(hud, 636, 117, 8, 8, 176, 40, 8, 8);
+        }
+      }
       function draw() {
         setTimeout(function () {
           requestAnimationFrame(draw);
@@ -639,6 +696,7 @@
           drawLink();
           gameObjectCollision(linkX, linkY, gameObjects, true);
           drawGameObjects();
+          drawHUD();
         }, 1000 / fps);
       }
       draw();
