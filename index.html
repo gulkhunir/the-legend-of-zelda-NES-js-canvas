@@ -34,6 +34,8 @@
       chars1.src = "./assets/char/chars.png";
       let chars2 = new Image();
       chars2.src = "./assets/char/chars2.png";
+      let enemiesDB = new Image();
+      enemiesDB.src = "./assets/enemies/enemies.png";
       let rightPressed = false;
       let leftPressed = false;
       let upPressed = false;
@@ -81,6 +83,23 @@
         this.pickUpItemNum = 0;
         this.isFlame = false;
         this.isOldWoman = false;
+        this.pickUpItemName = "";
+        this.isRupee = false;
+        this.rupeeValue = 1;
+        //Enemy
+        this.isEnemy = false;
+        this.enemyType = 0;
+        this.nextX = 0;
+        this.nextY = 0;
+        this.isAttacking = false;
+        this.health = 0;
+        this.direction = "left";
+        this.enemy = [];
+        this.counter = 0;
+        this.frame = 0;
+        this.needsBounce = false;
+        this.bounceX = 0;
+        this.bounceY = 0;
       }
 
       function MapBundle(m, o) {
@@ -267,6 +286,15 @@
       gO.newLinkX = 120;
       gO.newLinkY = 220;
       gO.isPortal = true;
+      objects7_7.push(gO);
+
+      gO = new GameObject();
+      gO.x = 160;
+      gO.y = 184;
+      gO.width = 16;
+      gO.height = 16;
+      gO.isEnemy = true;
+      gO.enemyType = 1;
       objects7_7.push(gO);
 
       let bundle = new MapBundle(map7_7, objects7_7);
@@ -641,6 +669,123 @@
               16
             );
           }
+          if (gameObjects[i].isEnemy) {
+            if (gameObjects[i].enemyType == 1) {
+              gameObjects[i].counter++;
+              if (gameObjects[i].counter >= 10) {
+                gameObjects[i].frame++;
+                gameObjects[i].counter = 0;
+                if (gameObjects[i].frame > 1) {
+                  gameObjects[i].frame = 0;
+                }
+              }
+            }
+            if (gameObjects[i].direction == "up") {
+              if (gameObjects[i].frame == 0) {
+                ctx.drawImage(
+                  enemiesDB,
+                  60,
+                  0,
+                  16,
+                  16,
+                  gameObjects[i].x,
+                  gameObjects[i].y,
+                  16,
+                  16
+                );
+              } else {
+                ctx.drawImage(
+                  enemiesDB,
+                  60,
+                  30,
+                  16,
+                  16,
+                  gameObjects[i].x,
+                  gameObjects[i].y,
+                  16,
+                  16
+                );
+              }
+            } else if (gameObjects[i].direction == "down") {
+              if (gameObjects[i].frame == 0) {
+                ctx.drawImage(
+                  enemiesDB,
+                  0,
+                  0,
+                  16,
+                  16,
+                  gameObjects[i].x,
+                  gameObjects[i].y,
+                  16,
+                  16
+                );
+              } else {
+                ctx.drawImage(
+                  enemiesDB,
+                  0,
+                  30,
+                  16,
+                  16,
+                  gameObjects[i].x,
+                  gameObjects[i].y,
+                  16,
+                  16
+                );
+              }
+            } else if (gameObjects[i].direction == "right") {
+              if (gameObjects[i].frame == 0) {
+                ctx.drawImage(
+                  enemiesDB,
+                  90,
+                  0,
+                  16,
+                  16,
+                  gameObjects[i].x,
+                  gameObjects[i].y,
+                  16,
+                  16
+                );
+              } else {
+                ctx.drawImage(
+                  enemiesDB,
+                  90,
+                  30,
+                  16,
+                  16,
+                  gameObjects[i].x,
+                  gameObjects[i].y,
+                  16,
+                  16
+                );
+              }
+            } else if (gameObjects[i].direction == "left") {
+              if (gameObjects[i].frame == 0) {
+                ctx.drawImage(
+                  enemiesDB,
+                  30,
+                  0,
+                  16,
+                  16,
+                  gameObjects[i].x,
+                  gameObjects[i].y,
+                  16,
+                  16
+                );
+              } else {
+                ctx.drawImage(
+                  enemiesDB,
+                  30,
+                  30,
+                  16,
+                  16,
+                  gameObjects[i].x,
+                  gameObjects[i].y,
+                  16,
+                  16
+                );
+              }
+            }
+          }
         }
       }
       function drawHUD() {
@@ -742,7 +887,7 @@
             8,
             8
           );
-          thirdNum = Math.floor(rupeeAmount / 100)
+          thirdNum = Math.floor(rupeeAmount / 100);
           ctx.drawImage(
             hud,
             528 + 8 * thirdNum + thirdNum,
@@ -758,37 +903,35 @@
         ctx.drawImage(hud, 519, 117, 8, 8, 96, 32, 8, 8);
         ctx.drawImage(hud, 519, 117, 8, 8, 96, 41, 8, 8);
         ctx.drawImage(
-            hud,
-            528 + 8 * keyAmount + keyAmount,
-            117,
-            8,
-            8,
-            96 + 8,
-            32,
-            8,
-            8
-          );
-          ctx.drawImage(
-            hud,
-            528 + 8 * bombAmount + bombAmount,
-            117,
-            8,
-            8,
-            96 + 8,
-            41,
-            8,
-            8
-          );
+          hud,
+          528 + 8 * keyAmount + keyAmount,
+          117,
+          8,
+          8,
+          96 + 8,
+          32,
+          8,
+          8
+        );
+        ctx.drawImage(
+          hud,
+          528 + 8 * bombAmount + bombAmount,
+          117,
+          8,
+          8,
+          96 + 8,
+          41,
+          8,
+          8
+        );
 
-        
         ctx.fillRect(128, 24, 8, 16);
         ctx.fillRect(152, 24, 8, 16);
-        if(swordEqipped == 1){
-            ctx.drawImage(hud,555,137,8,16,152,24,8,16)
+        if (swordEqipped == 1) {
+          ctx.drawImage(hud, 555, 137, 8, 16, 152, 24, 8, 16);
         }
         ctx.fillStyle = "gray";
         ctx.fillRect(16, 8, 64, 48);
-
       }
       function draw() {
         setTimeout(function () {
